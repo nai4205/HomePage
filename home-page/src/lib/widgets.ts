@@ -1,10 +1,13 @@
 import { Header } from '@/components/Header';
+import { Section } from '@/components/Section';
 
 export type Item = {
   name: string;
   slug: string;
   description?: string;
-  component?: React.FC<{ item: Item }>; 
+  component?: React.FC<{ item: Item  }>; 
+  width?: number;
+  height?: number;
 }
 
 export const widgets: { name: string; items: Item[] }[] = [
@@ -16,11 +19,14 @@ export const widgets: { name: string; items: Item[] }[] = [
         slug: 'layouts',
         description: 'Heading widget',
         component: Header,
+        width: 200,
+        height: 100,
       },
       {
-        name: 'Grouped Layouts',
+        name: 'Section',
         slug: 'route-groups',
         description: 'Organize routes without affecting URL paths',
+        component: Section,
       },
       {
         name: 'Parallel Routes',

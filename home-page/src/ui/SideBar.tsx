@@ -2,25 +2,28 @@
 
 import { widgets, type Item } from '@/lib/widgets';
 import Link from 'next/link';
-import { useSelectedLayoutSegment } from 'next/navigation';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
 import { useState } from 'react';
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { Header } from '@/components/Header';
+import { useRef, useEffect } from 'react';
 import { GlobalNavItem } from '@/components/GlobalNavItem';
 
 export function SideBar() {
   const [isOpen, setIsOpen] = useState(false);
   const close = () => setIsOpen(false);
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    console.log('width', ref.current ? ref.current.offsetWidth : 0);
+  }, [ref.current]);
 
   const [selectedWidget, setSelectedWidget] = useState<Item | null>(null);
 
 
   return (
     <DndProvider backend={HTML5Backend}>
-    <div className="fixed top-0 z-10 flex w-full flex-col border-b border-gray-800 bg-black lg:bottom-0 lg:z-auto lg:w-72 lg:border-b-0 lg:border-r lg:border-gray-800">
+    <div ref={ref} className="fixed top-0 z-10 flex w-full flex-col border-b border-gray-800 bg-black lg:bottom-0 lg:z-auto lg:w-72 lg:border-b-0 lg:border-r lg:border-gray-800">
       <div className="flex h-14 items-center px-4 py-4 lg:h-auto">
         <Link
           href="/"
