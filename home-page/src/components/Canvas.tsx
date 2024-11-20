@@ -58,6 +58,34 @@ export default function Page() {
         document.addEventListener('mouseup', onMouseUp);
     };
 
+    const onMove = (e: MouseEvent, id: string) => {
+        setCanvasWidgets((prev) =>
+        prev.map((widget) =>
+            widget.id === id
+            ? { ...widget, x: e.clientX - 288, y: e.clientY }
+            : widget
+        )
+        );
+    }
+
+    const onMoveStart = (
+        e: React.MouseEvent,
+        widgetId: string,
+    ) => {
+        e.preventDefault();
+
+        const onMouseMove = (e: MouseEvent) =>
+        onMove(e, widgetId);
+
+        const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }
+
     const [{ isOver }, dropRef] = useDrop(() => ({
         accept: widgets.flatMap((section) => section.items.map((item) => item.name)),
         drop: (item: Item, monitor) => {
@@ -137,6 +165,20 @@ export default function Page() {
                     }}
                     onMouseDown={(e) =>
                     onResizeStart(e, id, x, y, width, height) // Start resizing the specific widget
+                    }
+                />
+                <div
+                    style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    width: '10px',
+                    height: '10px',
+                    cursor: 'se-resize',
+                    backgroundColor: 'gray',
+                    }}
+                    onMouseDown={(e) =>
+                    onMoveStart(e, id) // Start resizing the specific widget
                     }
                 />
                 </div>
