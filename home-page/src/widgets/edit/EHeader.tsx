@@ -57,7 +57,7 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
 
     return (
         <div className='p-3 flex-1 w-full' ref={ref}>
-            <div className='flex justify-between items-center bg-gray-300 p-2 border-b'>
+            <div className='flex justify-between items-center bg-gray-800 p-2 border-2'>
                 <button onClick={handleDelete} className='text-red-500'><TrashIcon className="block w-6 text-gray-400"/>
                 </button>
                 <button onClick={handleApply} className='mt-2 p-2 bg-blue-500 text-white'><CheckIcon className='block w-6 text-gray-400'/></button>

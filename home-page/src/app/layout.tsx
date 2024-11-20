@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SideBar } from "../ui/SideBar";
 import { WidgetProvider } from "@/context/WidgetContext";
-
+import { OptionsProvider } from "@/context/OptionsContext";
 
 
 export const metadata: Metadata = {
@@ -16,6 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <OptionsProvider>
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,5 +32,7 @@ export default function RootLayout({
       </body>
       </WidgetProvider>
     </html>
+    </OptionsProvider>
+
   );
 }

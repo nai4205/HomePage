@@ -7,23 +7,32 @@ import { useReducer } from 'react';
 import { WidgetDispatchContext } from '@/context/WidgetContext';
 import { WidgetContext } from '@/context/WidgetContext';
 import { handleWidgetMove, handleWidgetResize, handleAddHeader, handleSave, handleLoad } from '@/context/WidgetContextFunctions';
+import { OptionsDispatchContext } from '@/context/OptionsContext';
+import { OptionsContext } from '@/context/OptionsContext';
+import { handleSnapTypeToggle, handleGridSizeChange } from '@/context/OptionsContextFunctions';
+import { CogIcon } from '@heroicons/react/24/outline';
 
-const GRID_SIZE = 400; // Define grid size for snapping
 
 export default function Page() {
     const canvasRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<{ [key: number]: HTMLDivElement | null }>({});
+    const [showOptions, setShowOptions] = useState(true);
     
     let nextId = 0;
 
     const dispatch = useContext(WidgetDispatchContext);
     const widgets = useContext(WidgetContext);
+
+    const optionsDispatch = useContext(OptionsDispatchContext);
+    const options = useContext(OptionsContext);
     
+    const GRID_SIZE = options[0].gridSize;
 
     // Resize handler that updates only the selected widget's width and height
     const onResize = (e: MouseEvent, startX: number, startY: number, startWidth: number, startHeight: number, id: number) => {
         const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();
         const contentBoundingRect = contentRef.current[id]?.getBoundingClientRect();
+        const snapType = options[0].snapType;
 
         // Calculate the mouse movement delta (change in position)
         if (!canvasBoundingRect) return;
@@ -65,11 +74,22 @@ export default function Page() {
     };
 
     const onMove = (e: MouseEvent, id: number) => {
+        const snapType = options[0].snapType;
         const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();
         const widget = widgets.find((widget) => widget.id === id);
         if (!canvasBoundingRect || !widget) return
-        var x =  Math.max(0, Math.min(e.clientX - canvasBoundingRect.left, canvasBoundingRect.width - widget.width))
-        var y = Math.max(0, Math.min(e.clientY - canvasBoundingRect.top, canvasBoundingRect.height - widget.height))
+        switch (snapType){
+            case 'float':
+                var x =  Math.max(0, Math.min(e.clientX - canvasBoundingRect.left, canvasBoundingRect.width - widget.width))
+                var y = Math.max(0, Math.min(e.clientY - canvasBoundingRect.top, canvasBoundingRect.height - widget.height))
+                break;
+            case 'grid':
+                var x = Math.max(0, Math.min(Math.floor((e.clientX - canvasBoundingRect.left) / GRID_SIZE) * GRID_SIZE, canvasBoundingRect.width - widget.width));
+                var y = Math.max(0, Math.min(Math.floor((e.clientY - canvasBoundingRect.top) / GRID_SIZE) * GRID_SIZE, canvasBoundingRect.height - widget.height));
+                break;
+            default:
+                break;
+        }
         handleWidgetMove(dispatch, id, x, y);
     }
 
@@ -98,15 +118,31 @@ export default function Page() {
         const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();        
 
         if (offset && canvasBoundingRect) {
-        
-        switch (item.name) {
-            case 'Header':
-                handleAddHeader(dispatch, offset.x - canvasBoundingRect.x, offset.y - canvasBoundingRect.y, nextId);
+        switch (options[0].snapType){
+            case 'float':
+                switch (item.name) {
+                    case 'Header':
+                        handleAddHeader(dispatch, offset.x - canvasBoundingRect.x, offset.y - canvasBoundingRect.y, nextId);
+                        break;
+                    default:
+                        break;
+                
+                }
+                break;
+            case 'grid':
+                switch (item.name) {
+                    case 'Header':
+                        handleAddHeader(dispatch, Math.floor((offset.x - canvasBoundingRect.x) / GRID_SIZE) * GRID_SIZE, Math.floor((offset.y - canvasBoundingRect.y) / GRID_SIZE) * GRID_SIZE, nextId);
+                        break;
+                    default:
+                        break;
+                }
                 break;
             default:
                 break;
+            }
         }
-        }
+    
         },
         collect: (monitor) => ({
         isOver: !!monitor.isOver(),
@@ -116,8 +152,31 @@ export default function Page() {
     return (
         <DndProvider backend={HTML5Backend}>
         <div ref={canvasRef} className="relative mx-auto flex-1 h-screen bg-gray-900">
-            <button className='bg-white m-1' onClick={() => handleSave(dispatch)}>Save</button>
-            <button className='bg-white' onClick={() => handleLoad(dispatch)}>Load</button>
+            <CogIcon className='top-0 left-0 mr-auto h-6 w-6 text-white cursor-pointer' onClick={() => setShowOptions(!showOptions)}/>
+            {showOptions ? (
+            <>
+                <button className='bg-white m-1' onClick={() => handleSave(dispatch)}>Save</button>
+                <button className='bg-white' onClick={() => handleLoad(dispatch)}>Load</button>
+                <button className='bg-white mx-1' onClick={() => handleSnapTypeToggle(optionsDispatch, 0)}>Toggle snap</button>
+                <div className="m-1 bg-white w-fit">
+                <label htmlFor="gridSize" className="mr-2">Grid Size:</label>
+                <input
+                    id="gridSize"
+                    type="range"
+                    min="10"
+                    max="300"
+                    step="10"
+                    defaultValue={GRID_SIZE}
+                    onChange={(e) => {
+                        const newSize = parseInt(e.target.value, 10);
+                        handleGridSizeChange(optionsDispatch, 0, newSize);
+                    }}
+                />
+                <span className="ml-2">{options[0].gridSize}px</span>
+            </div>
+            </>
+            ) : null}
+        
         <div
             ref={(element) => {
             if (element) {
