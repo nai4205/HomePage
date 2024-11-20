@@ -2,36 +2,29 @@ import { Header } from '@/components/Header';
 import { Section } from '@/components/Section';
 
 export type Item = {
+  id: number;
   name: string;
-  slug: string;
   description?: string;
   component?: React.FC<{ item: Item  }>; 
-  width?: number;
-  height?: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
 export const widgets: { name: string; items: Item[] }[] = [
   {
-    name: 'Text',
+    name: 'Widgets',
     items: [
       {
+        id: -1,
         name: 'Header',
-        slug: 'layouts',
         description: 'Heading widget',
         component: Header,
-        width: 200,
+        x: 0,
+        y: 0,
+        width: 250,
         height: 100,
-      },
-      {
-        name: 'Section',
-        slug: 'route-groups',
-        description: 'Organize routes without affecting URL paths',
-        component: Section,
-      },
-      {
-        name: 'Parallel Routes',
-        slug: 'parallel-routes',
-        description: 'Render multiple pages in the same layout',
       },
     ],
   },

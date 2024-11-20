@@ -1,20 +1,62 @@
 import React, { useState, useRef } from 'react';
 import { DndProvider, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { widgets, type Item } from '@/lib/widgets';
+import { widgets as widgetsInitial, type Item } from '@/lib/widgets';
+import { useReducer } from 'react';
 
 const GRID_SIZE = 400; // Define grid size for snapping
+
+function widgetReducer(widgets: Item[], action: any) {
+    switch (action.type) {
+        case 'move':
+            return widgets.map((widget) =>
+                widget.id === action.id
+                    ? { ...widget, x: action.x, y: action.y }
+                    : widget
+            );
+        case 'resize':
+            return widgets.map((widget) =>
+                widget.id === action.id
+                    ? { ...widget, width: action.width, height: action.height }
+                    : widget
+            );
+        case 'addedHeader':
+            return [...widgets, {
+                id: action.id,
+                name: action.name,
+                x: action.x,
+                y: action.y,
+                width: action.width,
+                height: action.height,
+                component: widgets.find((widget) => widget.name === action.name)?.component,
+               
+            }];
+        case 'remove':
+            return widgets.filter((widget) => widget.id !== action.payload);
+        case 'removeById':
+            return widgets.filter((widget) => widget.id !== action.id);
+        default:
+            throw Error('Unknown action type' + action.type);
+    }
+}
 
 export default function Page() {
     const canvasRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
-    const [canvasWidgets, setCanvasWidgets] = useState<
-        { id: string; widget: Item; x: number; y: number; width: number; height: number; sectionId?: string }[]
-    >([]);
+    
+    let nextId = 4;
+    const initialWidgets : Item[] = widgetsInitial[0].items;
+    console.log(initialWidgets);
+
+    const [widgets, dispatch] = useReducer<React.Reducer<Item[], any>>(
+            widgetReducer,
+            initialWidgets
+        );
+
 
 
     // Resize handler that updates only the selected widget's width and height
-    const onResize = (e: MouseEvent, startX: number, startY: number, startWidth: number, startHeight: number, id: string) => {
+    const onResize = (e: MouseEvent, startX: number, startY: number, startWidth: number, startHeight: number, id: number) => {
         const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();
         const contentBoundingRect = contentRef.current?.getBoundingClientRect();
 
@@ -28,28 +70,15 @@ export default function Page() {
         const canvasHeight = canvasBoundingRect.height;
         var newWidth = Math.min(Math.max(deltaX, contentBoundingRect?.width), canvasWidth - startX); 
         var newHeight = Math.min(Math.max(deltaY, contentBoundingRect?.height), canvasHeight - startY);
-        console.log("New width: ", newWidth, "New height: ", newHeight);
-        console.log("deltaX: ", deltaX, "deltaY: ", deltaY, "contentBoundingRect width: ", contentBoundingRect?.width, "contentBoundingRect height: ", contentBoundingRect?.height);
-        console.log("Canvas width: ", canvasWidth, "Canvas height: ", canvasHeight);
-        console.log("startX: ", startX, "startY: ", startY);
-
-        // console.log("Start x: ", startX, "Start y: ", startY, "Start width: ", startWidth, "Start height: ", startHeight, "New width: ", newWidth, "New height: ", newHeight);
-        // console.log("Client x: ", e.clientX, "Client y: ", e.clientY);
     
-        setCanvasWidgets((prev) =>
-            prev.map((widget) =>
-                widget.id === id
-                    ? { ...widget, width: newWidth, height: newHeight }
-                    : widget
-            )
-        );
+        handleWidgetResize(id, newWidth, newHeight);
     };
     
     
     // Start resizing by tracking the initial position and dimensions
     const onResizeStart = (
         e: React.MouseEvent,
-        widgetId: string,
+        widgetId: number,
         startX: number,
         startY: number,
         startWidth: number,
@@ -69,26 +98,18 @@ export default function Page() {
         document.addEventListener('mouseup', onMouseUp);
     };
 
-    const onMove = (e: MouseEvent, id: string) => {
+    const onMove = (e: MouseEvent, id: number) => {
         const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();
-        if (!canvasBoundingRect) return
-
-        setCanvasWidgets((prev) =>
-            prev.map((widget) =>
-            widget.id === id
-                ? {
-                ...widget,
-                x: Math.max(0, Math.min(e.clientX - canvasBoundingRect.left, canvasBoundingRect.width - widget.width)),
-                y: Math.max(0, Math.min(e.clientY - canvasBoundingRect.top, canvasBoundingRect.height - widget.height))
-                }
-                : widget
-            )
-        );
+        const widget = widgets.find((widget) => widget.id === id);
+        if (!canvasBoundingRect || !widget) return
+        var x =  Math.max(0, Math.min(e.clientX - canvasBoundingRect.left, canvasBoundingRect.width - widget.width))
+        var y = Math.max(0, Math.min(e.clientY - canvasBoundingRect.top, canvasBoundingRect.height - widget.height))
+        handleWidgetMove(id, x, y);
     }
 
     const onMoveStart = (
         e: React.MouseEvent,
-        widgetId: string,
+        widgetId: number,
     ) => {
         e.preventDefault();
 
@@ -104,47 +125,53 @@ export default function Page() {
         document.addEventListener('mouseup', onMouseUp);
     }
 
+    function handleAddHeader(x : number, y : number) {
+        dispatch({
+            type: 'addedHeader',
+            id: nextId++,
+            name: 'Header',
+            x: x,
+            y: y,
+            width: 200,
+            height: 200,
+        });
+    }
+
+    function handleWidgetMove(id: number, x: number, y: number) {
+        dispatch({
+            type: 'move',
+            id: id,
+            x: x,
+            y: y,
+        });
+    }
+
+    function handleWidgetResize(id: number, width: number, height: number) {
+        dispatch({
+            type: 'resize',
+            id: id,
+            width: width,
+            height: height,
+        });
+    }
+    
+
     const [{ isOver }, dropRef] = useDrop(() => ({
-        accept: widgets.flatMap((section) => section.items.map((item) => item.name)),
+        accept: widgets.map((widget) => widget.name),
         drop: (item: Item, monitor) => {
         const offset = monitor.getClientOffset();
         const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();
 
         if (offset && canvasBoundingRect) {
-            
-            const snapX = Math.floor(offset.x / GRID_SIZE) * GRID_SIZE;
-            const snapY = Math.floor(offset.y / GRID_SIZE) * GRID_SIZE;
-
-        if(item.name === 'Section') {
-            // Otherwise, place it normally on the canvas
-            setCanvasWidgets((prev) => [
-                ...prev,
-                {
-                id: `${item.name}-${Date.now()}`,
-                widget: item,
-                x: snapX,
-                y: snapY,
-                width: 200, // Default width for regular widgets
-                height: 100, // Default height for regular widgets
-                },
-            ]);
+        switch (item.name) {
+            case 'Header':
+                handleAddHeader(offset.x - canvasBoundingRect.x, offset.y - canvasBoundingRect.y);
+                break;
+            default:
+                break;
         }
-        else{
-            // Otherwise, place it normally on the canvas
-            setCanvasWidgets((prev) => [
-                ...prev,
-                {
-                id: `${item.name}-${Date.now()}`,
-                widget: item,
-                x: offset.x - canvasBoundingRect.left,
-                y: offset.y - canvasBoundingRect.top,
-                width: 200, // Default width for regular widgets
-                height: 100, // Default height for regular widgets
-                        },
-                    ]);
-                }
-            }
-            },
+        }
+        },
         collect: (monitor) => ({
         isOver: !!monitor.isOver(),
         }),
@@ -162,13 +189,13 @@ export default function Page() {
             className="flex-1 h-full"
             style={{ border: isOver ? '2px dashed white' : '2px solid transparent' }}
         >
-            {canvasWidgets.map(({ widget, x, y, width, height, id }) => (
+            {widgets.map( (widget : Item) => (
             <div
-                key={id}
+                key={widget.id}
                 className="absolute h-screen"
-                style={{ left: x, top: y, width, height, border: '2px solid #4CAF50' }}
+                style={{ left: widget.x, top: widget.y, width: widget.width, height: widget.height, border: '2px solid #4CAF50' }}
             >
-                <div className='absolute' style={{ width, height }}>
+                <div className='absolute' style={{ width: widget.width, height: widget.height }}>
                 {widget.component ? (
                     <div ref={contentRef} className='absolute'>
                     <widget.component item={widget}/>
@@ -188,8 +215,8 @@ export default function Page() {
                     cursor: 'se-resize',
                     backgroundColor: 'gray',
                     }}
-                    onMouseDown={(e) =>
-                    onResizeStart(e, id, x, y, width, height) // Start resizing the specific widget
+                    onMouseDown={(e) => 
+                    onResizeStart(e, widget.id, widget.x, widget.y, widget.width, widget.height) // Start resizing the specific widget
                     }
                 />
                 <div
@@ -203,7 +230,7 @@ export default function Page() {
                     backgroundColor: 'gray',
                     }}
                     onMouseDown={(e) =>
-                    onMoveStart(e, id) // Start resizing the specific widget
+                    onMoveStart(e, widget.id) // Start resizing the specific widget
                     }
                 />
                 </div>

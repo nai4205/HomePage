@@ -60,7 +60,7 @@ export function SideBar() {
 
           <div className="space-y-1">
             {section.items.map((item) => (
-              <GlobalNavItem key={item.slug} item={item} />
+              <GlobalNavItem key={item.id} item={item} />
             ))}
           </div>
             </div>
