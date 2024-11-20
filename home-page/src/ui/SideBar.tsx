@@ -13,10 +13,7 @@ import { GlobalNavItem } from '@/components/GlobalNavItem';
 export function SideBar() {
   const [isOpen, setIsOpen] = useState(false);
   const close = () => setIsOpen(false);
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    console.log('width', ref.current ? ref.current.offsetWidth : 0);
-  }, [ref.current]);
+  const ref = useRef(null)
 
   const [selectedWidget, setSelectedWidget] = useState<Item | null>(null);
 
@@ -36,6 +33,7 @@ export function SideBar() {
           </h3>
         </Link>
       </div>
+
       <button
         type="button"
         className="group absolute right-0 top-0 flex h-14 items-center gap-x-2 px-4 lg:hidden"
@@ -50,41 +48,42 @@ export function SideBar() {
           <Bars3Icon className="block w-6 text-gray-400" />
         )}
       </button>
+      {isOpen || (
+        <div className="hidden lg:block">
+          <nav className="space-y-6 px-2 pb-24 pt-5">
+        {widgets.map((section) => {
+          return (
+            <div key={section.name}>
+          <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400/80">
+            <div>{section.name}</div>
+          </div>
 
-      <div
-        className={clsx('overflow-y-auto lg:static lg:block', {
-          'fixed inset-x-0 bottom-0 top-14 mt-px bg-black': isOpen,
-          hidden: !isOpen,
+          <div className="space-y-1">
+            {section.items.map((item) => (
+              <GlobalNavItem key={item.slug} item={item} />
+            ))}
+          </div>
+            </div>
+          );
         })}
-      >
-        <nav className="space-y-6 px-2 pb-24 pt-5">
-          {widgets.map((section) => {
-            return (
-              <div key={section.name}>
-                <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400/80">
-                  <div>{section.name}</div>
-                </div>
-
-                <div className="space-y-1">
-                  {section.items.map((item) => (
-                    <GlobalNavItem key={item.slug} item={item} />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </nav>
-        {selectedWidget && (
+          </nav>
+          {selectedWidget && (
         <div>
-        {selectedWidget.component && (
-          <selectedWidget.component item={selectedWidget} />
-        )}
-      </div>
+          {selectedWidget.component && (
+            <selectedWidget.component item={selectedWidget} />
+          )}
+        </div>
+          )}
+        </div>
       )}
+
+
+
+      
       </div>
 
-    </div>
     </DndProvider>
   );
 }
 
+export default SideBar;

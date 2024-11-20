@@ -19,10 +19,10 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body className="overflow-y-scroll bg-gray-1100 pb-36">
+      <body className="bg-gray-1100 flex h-screen">
         <SideBar />
-        <div className="lg:pl-72">
-          <div className="">
+        <div className="lg:pl-72 flex-1">
+          <div className="flex-1">
               <div>{children}</div>
           </div>
         </div>
