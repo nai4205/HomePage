@@ -6,23 +6,24 @@ import { widgets as widgetsInitial, type Item } from '@/lib/widgets';
 import { useReducer } from 'react';
 import { WidgetDispatchContext } from '@/context/WidgetContext';
 import { WidgetContext } from '@/context/WidgetContext';
-import { handleWidgetMove, handleWidgetResize, handleAddHeader } from '@/context/WidgetContextFunctions';
+import { handleWidgetMove, handleWidgetResize, handleAddHeader, handleSave, handleLoad } from '@/context/WidgetContextFunctions';
 
 const GRID_SIZE = 400; // Define grid size for snapping
 
 export default function Page() {
     const canvasRef = useRef<HTMLDivElement>(null);
-    const contentRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<{ [key: number]: HTMLDivElement | null }>({});
     
     let nextId = 0;
 
     const dispatch = useContext(WidgetDispatchContext);
     const widgets = useContext(WidgetContext);
+    
 
     // Resize handler that updates only the selected widget's width and height
     const onResize = (e: MouseEvent, startX: number, startY: number, startWidth: number, startHeight: number, id: number) => {
         const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();
-        const contentBoundingRect = contentRef.current?.getBoundingClientRect();
+        const contentBoundingRect = contentRef.current[id]?.getBoundingClientRect();
 
         // Calculate the mouse movement delta (change in position)
         if (!canvasBoundingRect) return;
@@ -94,7 +95,7 @@ export default function Page() {
         accept: widgets.map((widget) => widget.name),
         drop: (item: Item, monitor) => {
         const offset = monitor.getClientOffset();
-        const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();
+        const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();        
 
         if (offset && canvasBoundingRect) {
         
@@ -115,6 +116,8 @@ export default function Page() {
     return (
         <DndProvider backend={HTML5Backend}>
         <div ref={canvasRef} className="relative mx-auto flex-1 h-screen bg-gray-900">
+            <button className='bg-white m-1' onClick={() => handleSave(dispatch)}>Save</button>
+            <button className='bg-white' onClick={() => handleLoad(dispatch)}>Load</button>
         <div
             ref={(element) => {
             if (element) {
@@ -124,6 +127,7 @@ export default function Page() {
             className="flex-1 h-full"
             style={{ border: isOver ? '2px dashed white' : '2px solid transparent' }}
         >
+            
             {widgets.filter(widget => widget.visible).map((widget: Item) => (
             <div
                 key={widget.id}
@@ -132,7 +136,7 @@ export default function Page() {
             >
                 <div className='absolute' style={{ width: widget.width, height: widget.height }}>
                 {widget.component ? (
-                    <div ref={contentRef} className='absolute'>
+                    <div ref={(el) => {contentRef.current[widget.id] = el}} className='absolute grid justify-items-start'>
                     <widget.component item={widget}/>
                     </div>
                 ) : 

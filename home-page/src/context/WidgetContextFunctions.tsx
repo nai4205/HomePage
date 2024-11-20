@@ -1,5 +1,7 @@
 'use client';
 
+import { widgets } from "@/lib/widgets";
+
 export const handleWidgetMove = (dispatch : React.Dispatch<any>, id: number, x: number, y: number) => {
     dispatch({
         type: 'move',
@@ -31,9 +33,36 @@ export const handleAddHeader = (dispatch : React.Dispatch<any>, x : number, y : 
     });
 }
 
+export const handleChangeComponent = (dispatch : React.Dispatch<any>, id: number, component: React.FC<{ item: any }>) => {
+    dispatch({
+        type: 'changeComponent',
+        id: id,
+        component: component,
+    });
+    
+}
+
+export const handleRefresh = (dispatch : React.Dispatch<any>) => {
+    dispatch({
+        type: 'refresh',
+    });
+}
+
 export const handleRemoveById = (dispatch : React.Dispatch<any>, id: number) => {
     dispatch({
         type: 'removeById',
         id: id,
+    });
+}
+
+export const handleSave = (dispatch : React.Dispatch<any>) => {
+    dispatch({
+        type: 'save',
+    });
+}
+
+export const handleLoad = (dispatch : React.Dispatch<any>) => {
+    dispatch({
+        type: 'load',
     });
 }

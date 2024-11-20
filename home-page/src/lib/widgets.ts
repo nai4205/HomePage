@@ -1,4 +1,4 @@
-import { Header } from '@/components/Header';
+import { Header } from '@/widgets/Header';
 import { Section } from '@/components/Section';
 
 export type Item = {
