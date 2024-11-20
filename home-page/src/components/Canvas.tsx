@@ -1,59 +1,23 @@
-import React, { useState, useRef } from 'react';
+'use client';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { DndProvider, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { widgets as widgetsInitial, type Item } from '@/lib/widgets';
 import { useReducer } from 'react';
+import { WidgetDispatchContext } from '@/context/WidgetContext';
+import { WidgetContext } from '@/context/WidgetContext';
+import { handleWidgetMove, handleWidgetResize, handleAddHeader } from '@/context/WidgetContextFunctions';
 
 const GRID_SIZE = 400; // Define grid size for snapping
-
-function widgetReducer(widgets: Item[], action: any) {
-    switch (action.type) {
-        case 'move':
-            return widgets.map((widget) =>
-                widget.id === action.id
-                    ? { ...widget, x: action.x, y: action.y }
-                    : widget
-            );
-        case 'resize':
-            return widgets.map((widget) =>
-                widget.id === action.id
-                    ? { ...widget, width: action.width, height: action.height }
-                    : widget
-            );
-        case 'addedHeader':
-            return [...widgets, {
-                id: action.id,
-                name: action.name,
-                x: action.x,
-                y: action.y,
-                width: action.width,
-                height: action.height,
-                component: widgets.find((widget) => widget.name === action.name)?.component,
-               
-            }];
-        case 'remove':
-            return widgets.filter((widget) => widget.id !== action.payload);
-        case 'removeById':
-            return widgets.filter((widget) => widget.id !== action.id);
-        default:
-            throw Error('Unknown action type' + action.type);
-    }
-}
 
 export default function Page() {
     const canvasRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     
-    let nextId = 4;
-    const initialWidgets : Item[] = widgetsInitial[0].items;
-    console.log(initialWidgets);
+    let nextId = 0;
 
-    const [widgets, dispatch] = useReducer<React.Reducer<Item[], any>>(
-            widgetReducer,
-            initialWidgets
-        );
-
-
+    const dispatch = useContext(WidgetDispatchContext);
+    const widgets = useContext(WidgetContext);
 
     // Resize handler that updates only the selected widget's width and height
     const onResize = (e: MouseEvent, startX: number, startY: number, startWidth: number, startHeight: number, id: number) => {
@@ -68,10 +32,11 @@ export default function Page() {
         // Calculate new width and height based on the delta of mouse movement
         const canvasWidth = canvasBoundingRect.width;
         const canvasHeight = canvasBoundingRect.height;
-        var newWidth = Math.min(Math.max(deltaX, contentBoundingRect?.width), canvasWidth - startX); 
-        var newHeight = Math.min(Math.max(deltaY, contentBoundingRect?.height), canvasHeight - startY);
+        if (!contentBoundingRect) return;
+        var newWidth = Math.min(Math.max(deltaX, contentBoundingRect.width), canvasWidth - startX); 
+        var newHeight = Math.min(Math.max(deltaY, contentBoundingRect.height), canvasHeight - startY);
     
-        handleWidgetResize(id, newWidth, newHeight);
+        handleWidgetResize(dispatch, id, newWidth, newHeight);
     };
     
     
@@ -104,7 +69,7 @@ export default function Page() {
         if (!canvasBoundingRect || !widget) return
         var x =  Math.max(0, Math.min(e.clientX - canvasBoundingRect.left, canvasBoundingRect.width - widget.width))
         var y = Math.max(0, Math.min(e.clientY - canvasBoundingRect.top, canvasBoundingRect.height - widget.height))
-        handleWidgetMove(id, x, y);
+        handleWidgetMove(dispatch, id, x, y);
     }
 
     const onMoveStart = (
@@ -125,37 +90,6 @@ export default function Page() {
         document.addEventListener('mouseup', onMouseUp);
     }
 
-    function handleAddHeader(x : number, y : number) {
-        dispatch({
-            type: 'addedHeader',
-            id: nextId++,
-            name: 'Header',
-            x: x,
-            y: y,
-            width: 200,
-            height: 200,
-        });
-    }
-
-    function handleWidgetMove(id: number, x: number, y: number) {
-        dispatch({
-            type: 'move',
-            id: id,
-            x: x,
-            y: y,
-        });
-    }
-
-    function handleWidgetResize(id: number, width: number, height: number) {
-        dispatch({
-            type: 'resize',
-            id: id,
-            width: width,
-            height: height,
-        });
-    }
-    
-
     const [{ isOver }, dropRef] = useDrop(() => ({
         accept: widgets.map((widget) => widget.name),
         drop: (item: Item, monitor) => {
@@ -163,9 +97,10 @@ export default function Page() {
         const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();
 
         if (offset && canvasBoundingRect) {
+        
         switch (item.name) {
             case 'Header':
-                handleAddHeader(offset.x - canvasBoundingRect.x, offset.y - canvasBoundingRect.y);
+                handleAddHeader(dispatch, offset.x - canvasBoundingRect.x, offset.y - canvasBoundingRect.y, nextId);
                 break;
             default:
                 break;
@@ -189,7 +124,7 @@ export default function Page() {
             className="flex-1 h-full"
             style={{ border: isOver ? '2px dashed white' : '2px solid transparent' }}
         >
-            {widgets.map( (widget : Item) => (
+            {widgets.filter(widget => widget.visible).map((widget: Item) => (
             <div
                 key={widget.id}
                 className="absolute h-screen"

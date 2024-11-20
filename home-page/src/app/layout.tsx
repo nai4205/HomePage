@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SideBar } from "../ui/SideBar";
+import { WidgetProvider } from "@/context/WidgetContext";
 
 
 
@@ -19,6 +20,7 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
+      <WidgetProvider>
       <body className="bg-gray-1100 flex h-screen">
         <SideBar />
         <div className="lg:pl-72 flex-1">
@@ -27,6 +29,7 @@ export default function RootLayout({
           </div>
         </div>
       </body>
+      </WidgetProvider>
     </html>
   );
 }
