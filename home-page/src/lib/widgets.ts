@@ -1,4 +1,5 @@
-import { Header } from '@/widgets/Header';
+import { Header } from '@/widgets/Header/Header';
+import { HeaderToolBar } from '@/widgets/Header/HeaderToolBar';
 import { Section } from '@/components/Section';
 
 export type Item = {
@@ -6,6 +7,7 @@ export type Item = {
   name: string;
   description?: string;
   component?: React.FC<{ item: Item  }>; 
+  toolBar?: React.FC<{ item: Item }>;
   x: number;
   y: number;
   width: number;
@@ -23,6 +25,7 @@ export const widgets: { name: string; items: Item[] }[] = [
         name: 'Header',
         description: 'Heading widget',
         component: Header,
+        toolBar: HeaderToolBar,
         x: 0,
         y: 0,
         width: 250,

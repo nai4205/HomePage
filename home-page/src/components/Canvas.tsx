@@ -154,70 +154,82 @@ export default function Page() {
 
     return (
         <DndProvider backend={HTML5Backend}>
-        <div ref={canvasRef} className="relative mx-auto flex-1 h-screen bg-gray-900">
+            <div ref={canvasRef} className="relative mx-auto flex-1 h-screen bg-gray-900">
             <Options options={options} dispatch={dispatch} optionsDispatch={optionsDispatch} />
-        <div
-            ref={(element) => {
-            if (element) {
-                dropRef(element); // Connect react-dnd's ref to this element
-            }
-            }}
-            className="flex-1 h-full"
-            style={{ border: isOver ? '2px dashed white' : '2px solid transparent' }}
-        >
-            
-            {widgets.filter(widget => widget.visible).map((widget: Item) => (
             <div
-                key={widget.id}
-                className="absolute h-screen"
-                style={{ left: widget.x, top: widget.y, width: widget.width, height: widget.height, border: widget.isEditing ? '2px solid #4CAF50' : '1px dotted white' }}
+                ref={(element) => {
+                if (element) {
+                    dropRef(element); // Connect react-dnd's ref to this element
+                }
+                }}
+                className="flex-1 h-full"
+                style={{ border: isOver ? '2px dashed white' : '2px solid transparent' }}
             >
-                <div className='absolute' style={{ width: widget.width, height: widget.height }}>
-                {widget.component ? (
-                    <div ref={(el) => {contentRef.current[widget.id] = el}} className='absolute grid justify-items-start'>
-                    <widget.component item={widget}/>
+                {widgets.filter(widget => widget.visible).map((widget: Item) => (
+                <div key={widget.id}>
+                <div>
+                {widget.toolBar && widget.isEditing ? (
+                    <div className='absolute h-screen' style={{left: widget.x, top: widget.y - 40, width: widget.width, height: widget.height}}>
+                        <div style={{ border: '2px solid #4CAF50' }} className='w-full'>
+                        <widget.toolBar item={widget} />
+                        </div>
                     </div>
-                ) : 
-                (
-                    <div className="text-white">{widget.name}</div>
-                )}
-                {widget.isEditing ? (
-                <>
-                    <div
-                        style={{
-                        position: 'absolute',
-                        right: 0,
-                        bottom: 0,
-                        width: '10px',
-                        height: '10px',
-                        cursor: 'se-resize',
-                        backgroundColor: 'gray',
-                        }}
-                        onMouseDown={(e) => 
-                        onResizeStart(e, widget.id, widget.x, widget.y, widget.width, widget.height) // Start resizing the specific widget
-                        }
-                    />
-                    <div
-                        style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        width: '10px',
-                        height: '10px',
-                        cursor: 'se-resize',
-                        backgroundColor: 'gray',
-                        }}
-                        onMouseDown={(e) =>
-                        onMoveStart(e, widget.id) // Start resizing the specific widget
-                        }
-                    />
-                </>
-                ) : null}
+                    ) : null}
                 </div>
+                <div
+                    className="absolute h-screen"
+                    style={{ left: widget.x, top: widget.y, width: widget.width, height: widget.height }}
+                >
+                    <div className='absolute flex-row' style={{ width: widget.width, height: widget.height, border: '1px solid white' }}>
+                        <div ref={(el) => { contentRef.current[widget.id] = el }} className='absolute flex-auto'>
+                        <div style={{borderTop: '1px solid white'}}>
+                        {widget.component ? (
+                            <div>
+                            <widget.component item={widget} />
+                            </div>
+                        ) : (
+                            <div className="text-white">{widget.name}</div>
+                        )}
+                        </div>
+                        </div>
+                    {widget.isEditing ? (
+                        <>
+                        <div
+                            style={{
+                            position: 'absolute',
+                            right: 0,
+                            bottom: 0,
+                            width: '10px',
+                            height: '10px',
+                            cursor: 'se-resize',
+                            backgroundColor: 'gray',
+                            }}
+                            onMouseDown={(e) =>
+                            onResizeStart(e, widget.id, widget.x, widget.y, widget.width, widget.height) // Start resizing the specific widget
+                            }
+                        />
+                        <div
+                            style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 0,
+                            width: '10px',
+                            height: '10px',
+                            cursor: 'se-resize',
+                            backgroundColor: 'gray',
+                            }}
+                            onMouseDown={(e) =>
+                            onMoveStart(e, widget.id) // Start resizing the specific widget
+                            }
+                        />
+                        </>
+                    ) : null}
+                    </div>
+                </div>
+                </div>
+                ))}
             </div>
-            ))}
-        </div>
-        </div>
+            </div>
         </DndProvider>
     );
     }

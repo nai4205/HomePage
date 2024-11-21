@@ -48,6 +48,7 @@ function widgetReducer(widgets: Item[], action: any) {
                 width: action.width,
                 height: action.height,
                 component: widgets.find((widget) => widget.name === action.name)?.component,
+                toolBar: widgets.find((widget) => widget.name === action.name)?.toolBar,
                 visible: action.visible,
                
             }];
