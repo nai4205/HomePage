@@ -26,17 +26,21 @@ export function OptionsProvider({children} : any){
 function optionsReducer(options: Options[], action: any) {
     switch (action.type) {
         case 'changeSnapType':
-            return [...options, { snapType: action.snapType, id: action.id, gridSize: action.gridSize }];
+            return options.map((option) =>
+                option.id === action.id
+                    ? { ...option, snapType: action.snapType, gridSizeWidth: option.gridSizeWidth, gridSizeHeight: option.gridSizeHeight }
+                    : option
+            );  
         case 'toggleSnapType':
             return options.map((option) =>
                 option.id === action.id
-                    ? { ...option, snapType: option.snapType === 'float' ? 'grid' : 'float', gridSize: option.gridSize }
+                    ? { ...option, snapType: option.snapType === 'float' ? 'grid' : 'float', gridSizeWidth: option.gridSizeWidth, gridSizeHeight: option.gridSizeHeight }
                     : option
             );
         case 'changeGridSize':
             return options.map((option) =>
                 option.id === action.id
-                    ? { ...option, gridSize: action.gridSize }
+                    ? { ...option, gridSizeWidth: action.gridSizeWidth, gridSizeHeight: action.gridSizeHeight }
                     : option
             );
         default:

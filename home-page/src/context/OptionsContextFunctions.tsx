@@ -12,10 +12,11 @@ export const handleSnapTypeToggle = (dispatch : React.Dispatch<any>, id: number)
         id: id,
     });
 }
-export const handleGridSizeChange = (dispatch : React.Dispatch<any>, id: number, gridSize: number) => {
+export const handleGridSizeChange = (dispatch : React.Dispatch<any>, id: number, gridSizeWidth: number, gridSizeHeight: number) => {
     dispatch({
         type: 'changeGridSize',
         id: id,
-        gridSize: gridSize,
+        gridSizeWidth: gridSizeWidth,
+        gridSizeHeight: gridSizeHeight,
     });
 }

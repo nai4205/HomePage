@@ -8,7 +8,7 @@ import { WidgetContext } from '@/context/WidgetContext';
 import { handleWidgetMove, handleWidgetResize, handleAddHeader, } from '@/context/WidgetContextFunctions';
 import { OptionsDispatchContext } from '@/context/OptionsContext';
 import { OptionsContext } from '@/context/OptionsContext';
-import  Options  from './Options';
+import  { Options } from './Options';
 
 
 export default function Page() {
@@ -24,7 +24,8 @@ export default function Page() {
     const optionsDispatch = useContext(OptionsDispatchContext);
     const options = useContext(OptionsContext);
     
-    const GRID_SIZE = options[0].gridSize;
+    const GRID_SIZE_WIDTH = options[0].gridSizeWidth;
+    const GRID_SIZE_HEIGHT = options[0].gridSizeHeight;
 
     // Resize handler that updates only the selected widget's width and height
     const onResize = (e: MouseEvent, startX: number, startY: number, startWidth: number, startHeight: number, id: number) => {
@@ -43,7 +44,11 @@ export default function Page() {
         if (!contentBoundingRect) return;
         var newWidth = Math.min(Math.max(deltaX, contentBoundingRect.width), canvasWidth - startX); 
         var newHeight = Math.min(Math.max(deltaY, contentBoundingRect.height), canvasHeight - startY);
-    
+        if(snapType === 'grid'){
+            var newWidth = Math.max(Math.floor(newWidth / GRID_SIZE_WIDTH) * GRID_SIZE_WIDTH, contentBoundingRect.width);
+            var newHeight = Math.max(Math.floor(newHeight / GRID_SIZE_HEIGHT) * GRID_SIZE_HEIGHT, contentBoundingRect.height);
+        }
+
         handleWidgetResize(dispatch, id, newWidth, newHeight);
     };
     
@@ -82,8 +87,8 @@ export default function Page() {
                 var y = Math.max(0, Math.min(e.clientY - canvasBoundingRect.top, canvasBoundingRect.height - widget.height))
                 break;
             case 'grid':
-                var x = Math.max(0, Math.min(Math.floor((e.clientX - canvasBoundingRect.left) / GRID_SIZE) * GRID_SIZE, canvasBoundingRect.width - widget.width));
-                var y = Math.max(0, Math.min(Math.floor((e.clientY - canvasBoundingRect.top) / GRID_SIZE) * GRID_SIZE, canvasBoundingRect.height - widget.height));
+                var x = Math.floor((e.clientX - canvasBoundingRect.left) / GRID_SIZE_WIDTH) * GRID_SIZE_WIDTH;
+                var y = Math.floor((e.clientY - canvasBoundingRect.top) / GRID_SIZE_HEIGHT) * GRID_SIZE_HEIGHT;
                 break;
             default:
                 break;
@@ -130,7 +135,7 @@ export default function Page() {
             case 'grid':
                 switch (item.name) {
                     case 'Header':
-                        handleAddHeader(dispatch, Math.floor((offset.x - canvasBoundingRect.x) / GRID_SIZE) * GRID_SIZE, Math.floor((offset.y - canvasBoundingRect.y) / GRID_SIZE) * GRID_SIZE, nextId);
+                        handleAddHeader(dispatch, Math.floor((offset.x - canvasBoundingRect.x) / GRID_SIZE_WIDTH) * GRID_SIZE_WIDTH, Math.floor((offset.y - canvasBoundingRect.y) / GRID_SIZE_HEIGHT) * GRID_SIZE_HEIGHT, nextId);
                         break;
                     default:
                         break;
@@ -150,7 +155,7 @@ export default function Page() {
     return (
         <DndProvider backend={HTML5Backend}>
         <div ref={canvasRef} className="relative mx-auto flex-1 h-screen bg-gray-900">
-            {Options(dispatch, optionsDispatch, options)}
+            <Options options={options} dispatch={dispatch} optionsDispatch={optionsDispatch} />
         <div
             ref={(element) => {
             if (element) {

@@ -2,10 +2,21 @@ import React from 'react';
 import { CogIcon } from '@heroicons/react/24/solid';
 import { handleSave, handleLoad } from '@/context/WidgetContextFunctions';
 import { handleSnapTypeToggle, handleGridSizeChange } from '@/context/OptionsContextFunctions';
+import { WidgetContext } from '@/context/WidgetContext';
+import { useContext } from 'react';
 
-export default function Options(dispatch: React.Dispatch<any>, optionsDispatch: React.Dispatch<any>, options: any) {    
+
+export const Options: React.FC<{ options: any, dispatch: React.Dispatch<any>, optionsDispatch: React.Dispatch<any> }> = ({ options, dispatch, optionsDispatch }) => {
     const [showOptions, setShowOptions] = React.useState(false);
     const GRID_SIZE = options[0].gridSize;
+            const widgets = useContext(WidgetContext);
+
+
+    function handleWidgetSizeGrid(optionsDispatch: React.Dispatch<any>) {
+        const currentWidget = widgets.filter((widget) => widget.isEditing === true);
+        handleGridSizeChange(optionsDispatch, 0, currentWidget[0].width, currentWidget[0].height);
+    }
+    
 
     return (
         <div>
@@ -26,10 +37,11 @@ export default function Options(dispatch: React.Dispatch<any>, optionsDispatch: 
                         defaultValue={GRID_SIZE}
                         onChange={(e) => {
                             const newSize = parseInt(e.target.value, 10);
-                            handleGridSizeChange(optionsDispatch, 0, newSize);
+                            handleGridSizeChange(optionsDispatch, 0, newSize, newSize);
                         }}
                     />
-                    <span className="ml-2">{options[0].gridSize}px</span>
+                    <button className='bg-white' onClick={() => handleWidgetSizeGrid(optionsDispatch)}>Widget size</button>
+                    <span className="ml-2">{options[0].gridSizeWidth}x{options[0].gridSizeHeight} px</span>
                 </div>
                 </>
             ) : null}

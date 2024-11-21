@@ -1,13 +1,15 @@
 export interface Options {
     id: number
     snapType: string;
-    gridSize: number;
+    gridSizeWidth: number;
+    gridSizeHeight: number;
 }
 
 export const options : Options[] = [
     {
     id: 0,
     snapType: 'float',
-    gridSize: 10
+    gridSizeWidth: 10,
+    gridSizeHeight: 10,
     }
 ]
