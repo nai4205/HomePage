@@ -11,6 +11,7 @@ export type Item = {
   width: number;
   height: number;
   visible: boolean;
+  isEditing: boolean;
 }
 
 export const widgets: { name: string; items: Item[] }[] = [
@@ -27,6 +28,7 @@ export const widgets: { name: string; items: Item[] }[] = [
         width: 250,
         height: 100,
         visible: false,
+        isEditing: false,
       },
     ],
   },

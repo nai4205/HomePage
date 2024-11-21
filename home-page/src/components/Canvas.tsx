@@ -3,14 +3,12 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { DndProvider, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { widgets as widgetsInitial, type Item } from '@/lib/widgets';
-import { useReducer } from 'react';
 import { WidgetDispatchContext } from '@/context/WidgetContext';
 import { WidgetContext } from '@/context/WidgetContext';
-import { handleWidgetMove, handleWidgetResize, handleAddHeader, handleSave, handleLoad } from '@/context/WidgetContextFunctions';
+import { handleWidgetMove, handleWidgetResize, handleAddHeader, } from '@/context/WidgetContextFunctions';
 import { OptionsDispatchContext } from '@/context/OptionsContext';
 import { OptionsContext } from '@/context/OptionsContext';
-import { handleSnapTypeToggle, handleGridSizeChange } from '@/context/OptionsContextFunctions';
-import { CogIcon } from '@heroicons/react/24/outline';
+import  Options  from './Options';
 
 
 export default function Page() {
@@ -152,31 +150,7 @@ export default function Page() {
     return (
         <DndProvider backend={HTML5Backend}>
         <div ref={canvasRef} className="relative mx-auto flex-1 h-screen bg-gray-900">
-            <CogIcon className='top-0 left-0 mr-auto h-6 w-6 text-white cursor-pointer' onClick={() => setShowOptions(!showOptions)}/>
-            {showOptions ? (
-            <>
-                <button className='bg-white m-1' onClick={() => handleSave(dispatch)}>Save</button>
-                <button className='bg-white' onClick={() => handleLoad(dispatch)}>Load</button>
-                <button className='bg-white mx-1' onClick={() => handleSnapTypeToggle(optionsDispatch, 0)}>Toggle snap</button>
-                <div className="m-1 bg-white w-fit">
-                <label htmlFor="gridSize" className="mr-2">Grid Size:</label>
-                <input
-                    id="gridSize"
-                    type="range"
-                    min="10"
-                    max="300"
-                    step="10"
-                    defaultValue={GRID_SIZE}
-                    onChange={(e) => {
-                        const newSize = parseInt(e.target.value, 10);
-                        handleGridSizeChange(optionsDispatch, 0, newSize);
-                    }}
-                />
-                <span className="ml-2">{options[0].gridSize}px</span>
-            </div>
-            </>
-            ) : null}
-        
+            {Options(dispatch, optionsDispatch, options)}
         <div
             ref={(element) => {
             if (element) {
@@ -191,7 +165,7 @@ export default function Page() {
             <div
                 key={widget.id}
                 className="absolute h-screen"
-                style={{ left: widget.x, top: widget.y, width: widget.width, height: widget.height, border: '2px solid #4CAF50' }}
+                style={{ left: widget.x, top: widget.y, width: widget.width, height: widget.height, border: widget.isEditing ? '2px solid #4CAF50' : '1px dotted white' }}
             >
                 <div className='absolute' style={{ width: widget.width, height: widget.height }}>
                 {widget.component ? (
@@ -202,35 +176,38 @@ export default function Page() {
                 (
                     <div className="text-white">{widget.name}</div>
                 )}
-
-                <div
-                    style={{
-                    position: 'absolute',
-                    right: 0,
-                    bottom: 0,
-                    width: '10px',
-                    height: '10px',
-                    cursor: 'se-resize',
-                    backgroundColor: 'gray',
-                    }}
-                    onMouseDown={(e) => 
-                    onResizeStart(e, widget.id, widget.x, widget.y, widget.width, widget.height) // Start resizing the specific widget
-                    }
-                />
-                <div
-                    style={{
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    width: '10px',
-                    height: '10px',
-                    cursor: 'se-resize',
-                    backgroundColor: 'gray',
-                    }}
-                    onMouseDown={(e) =>
-                    onMoveStart(e, widget.id) // Start resizing the specific widget
-                    }
-                />
+                {widget.isEditing ? (
+                <>
+                    <div
+                        style={{
+                        position: 'absolute',
+                        right: 0,
+                        bottom: 0,
+                        width: '10px',
+                        height: '10px',
+                        cursor: 'se-resize',
+                        backgroundColor: 'gray',
+                        }}
+                        onMouseDown={(e) => 
+                        onResizeStart(e, widget.id, widget.x, widget.y, widget.width, widget.height) // Start resizing the specific widget
+                        }
+                    />
+                    <div
+                        style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        width: '10px',
+                        height: '10px',
+                        cursor: 'se-resize',
+                        backgroundColor: 'gray',
+                        }}
+                        onMouseDown={(e) =>
+                        onMoveStart(e, widget.id) // Start resizing the specific widget
+                        }
+                    />
+                </>
+                ) : null}
                 </div>
             </div>
             ))}

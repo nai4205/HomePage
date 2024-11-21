@@ -55,6 +55,14 @@ export const handleRemoveById = (dispatch : React.Dispatch<any>, id: number) => 
     });
 }
 
+export const handleIsEditing = (dispatch : React.Dispatch<any>, id: number, isEditing: boolean) => {
+    dispatch({
+        type: 'isEditing',
+        id: id,
+        isEditing: isEditing,
+    });
+}
+
 export const handleSave = (dispatch : React.Dispatch<any>) => {
     dispatch({
         type: 'save',
@@ -66,3 +74,4 @@ export const handleLoad = (dispatch : React.Dispatch<any>) => {
         type: 'load',
     });
 }
+

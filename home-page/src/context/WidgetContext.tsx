@@ -63,6 +63,12 @@ function widgetReducer(widgets: Item[], action: any) {
                     ? { ...widget, component: action.component }
                     : widget
             );
+        case 'isEditing':
+            return widgets.map((widget) =>
+                widget.id === action.id
+                    ? { ...widget, isEditing: action.isEditing }
+                    : { ...widget, isEditing: false }
+            );
         case 'refresh':
             return widgets.map((widget) => widget);
         case 'remove':
@@ -79,6 +85,7 @@ function widgetReducer(widgets: Item[], action: any) {
                 return parsedWidgets.map((widget: Item) => ({
                     ...widget,
                     component: widgets.find((w) => w.name === widget.name)?.component,
+                    isEditing: false,
                 }));
             }
             return widgetsInitial[0].items;
