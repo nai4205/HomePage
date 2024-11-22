@@ -3,6 +3,8 @@ export interface Options {
     snapType: string;
     gridSizeWidth: number;
     gridSizeHeight: number;
+    canvasWidth: number;
+    canvasHeight: number;
 }
 
 export const options : Options[] = [
@@ -11,5 +13,8 @@ export const options : Options[] = [
     snapType: 'float',
     gridSizeWidth: 10,
     gridSizeHeight: 10,
-    }
+    canvasWidth: 0,
+    canvasHeight: 0
+    },
+
 ]

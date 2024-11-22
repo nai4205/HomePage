@@ -63,6 +63,12 @@ export const handleIsEditing = (dispatch : React.Dispatch<any>, id: number, isEd
     });
 }
 
+export const resizeAllWidgets = (dispatch : React.Dispatch<any>) => {
+    dispatch({
+        type: 'resizeAll',
+    });
+}
+
 export const handleSave = (dispatch : React.Dispatch<any>) => {
     dispatch({
         type: 'save',

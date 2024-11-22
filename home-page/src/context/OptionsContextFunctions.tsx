@@ -20,3 +20,11 @@ export const handleGridSizeChange = (dispatch : React.Dispatch<any>, id: number,
         gridSizeHeight: gridSizeHeight,
     });
 }
+
+export const handleStoreCanvasSize = (dispatch : React.Dispatch<any>, width: number, height: number) => {
+    dispatch({
+        type: 'storeCanvasSize',
+        width: width,
+        height: height,
+    });
+}

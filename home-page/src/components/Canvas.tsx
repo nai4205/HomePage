@@ -9,13 +9,14 @@ import { handleWidgetMove, handleWidgetResize, handleAddHeader, } from '@/contex
 import { OptionsDispatchContext } from '@/context/OptionsContext';
 import { OptionsContext } from '@/context/OptionsContext';
 import  { Options } from './Options';
+import { handleStoreCanvasSize } from '@/context/OptionsContextFunctions';
 
 
 export default function Page() {
     const canvasRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<{ [key: number]: HTMLDivElement | null }>({});
-    const [showOptions, setShowOptions] = useState(true);
-    
+
+
     let nextId = 0;
 
     const dispatch = useContext(WidgetDispatchContext);
@@ -24,13 +25,40 @@ export default function Page() {
     const optionsDispatch = useContext(OptionsDispatchContext);
     const options = useContext(OptionsContext);
     
-    const GRID_SIZE_WIDTH = options[0].gridSizeWidth;
-    const GRID_SIZE_HEIGHT = options[0].gridSizeHeight;
+    const GRID_SIZE_WIDTH = options[0]?.gridSizeWidth || 0;
+    const GRID_SIZE_HEIGHT = options[0]?.gridSizeHeight || 0;
+
+    useEffect(() => {
+        handleStoreCanvasSize(optionsDispatch, canvasRef.current?.clientWidth || 0, canvasRef.current?.clientHeight || 0);
+    },[]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            const oldCanvasWidth = options[0].canvasWidth;
+            const oldCanvasHeight = options[0].canvasHeight;
+            const newCanvasWidth = canvasRef.current?.clientWidth || 0;
+            const newCanvasHeight = canvasRef.current?.clientHeight || 0;
+            if (oldCanvasWidth === newCanvasWidth && oldCanvasHeight === newCanvasHeight) return;
+            handleStoreCanvasSize(optionsDispatch, newCanvasWidth, newCanvasHeight || 0);
+            const ratioWidth = newCanvasWidth / oldCanvasWidth;
+            const ratioHeight = newCanvasHeight / oldCanvasHeight;
+            widgets.forEach((widget) => {
+                handleWidgetMove(dispatch, widget.id, widget.x * ratioWidth, widget.y * ratioHeight);
+                handleWidgetResize(dispatch, widget.id, widget.width * ratioWidth, widget.height * ratioHeight);
+            });
+        };
+    
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [canvasRef.current?.getBoundingClientRect(), options, widgets, dispatch, optionsDispatch]);
+
 
     // Resize handler that updates only the selected widget's width and height
     const onResize = (e: MouseEvent, startX: number, startY: number, startWidth: number, startHeight: number, id: number) => {
         const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();
         const contentBoundingRect = contentRef.current[id]?.getBoundingClientRect();
+        const canvasWidth = canvasBoundingRect?.width || 0;
+        const canvasHeight = canvasBoundingRect?.height || 0;
         const snapType = options[0].snapType;
 
         // Calculate the mouse movement delta (change in position)
@@ -39,8 +67,7 @@ export default function Page() {
         const deltaY = e.clientY - canvasBoundingRect.top - startY;
     
         // Calculate new width and height based on the delta of mouse movement
-        const canvasWidth = canvasBoundingRect.width;
-        const canvasHeight = canvasBoundingRect.height;
+
         if (!contentBoundingRect) return;
         var newWidth = Math.min(Math.max(deltaX, contentBoundingRect.width), canvasWidth - startX); 
         var newHeight = Math.min(Math.max(deltaY, contentBoundingRect.height), canvasHeight - startY);
@@ -87,8 +114,10 @@ export default function Page() {
                 var y = Math.max(0, Math.min(e.clientY - canvasBoundingRect.top, canvasBoundingRect.height - widget.height))
                 break;
             case 'grid':
-                var x = Math.floor((e.clientX - canvasBoundingRect.left) / GRID_SIZE_WIDTH) * GRID_SIZE_WIDTH;
-                var y = Math.floor((e.clientY - canvasBoundingRect.top) / GRID_SIZE_HEIGHT) * GRID_SIZE_HEIGHT;
+                x = Math.floor((e.clientX - canvasBoundingRect.left) / GRID_SIZE_WIDTH) * GRID_SIZE_WIDTH;
+                y = Math.floor((e.clientY - canvasBoundingRect.top) / GRID_SIZE_HEIGHT) * GRID_SIZE_HEIGHT;
+                x = Math.max(0, Math.min(x, canvasBoundingRect.width - widget.width));
+                y = Math.max(0, Math.min(y, canvasBoundingRect.height - widget.height));
                 break;
             default:
                 break;
@@ -113,19 +142,26 @@ export default function Page() {
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
     }
+   
 
     const [{ isOver }, dropRef] = useDrop(() => ({
         accept: widgets.map((widget) => widget.name),
         drop: (item: Item, monitor) => {
         const offset = monitor.getClientOffset();
-        const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();        
+        const canvasBoundingRect = canvasRef.current?.getBoundingClientRect();       
+        
 
         if (offset && canvasBoundingRect) {
+        const xPosCanvas = offset.x - canvasBoundingRect.x;
+        const yPosCanvas = offset.y - canvasBoundingRect.y; 
+        const xPercentage = xPosCanvas / canvasBoundingRect.width;
+        const yPercentage = yPosCanvas / canvasBoundingRect.height;
+
         switch (options[0].snapType){
             case 'float':
                 switch (item.name) {
                     case 'Header':
-                        handleAddHeader(dispatch, offset.x - canvasBoundingRect.x, offset.y - canvasBoundingRect.y, nextId);
+                        handleAddHeader(dispatch, xPosCanvas, yPosCanvas, nextId);
                         break;
                     default:
                         break;
@@ -145,7 +181,6 @@ export default function Page() {
                 break;
             }
         }
-    
         },
         collect: (monitor) => ({
         isOver: !!monitor.isOver(),
@@ -154,8 +189,10 @@ export default function Page() {
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div ref={canvasRef} className="relative mx-auto flex-1 h-screen bg-gray-900">
+            <div ref={canvasRef} className="relative mx-auto flex-1 h-screen bg-gray-900" >
+            <div className='bg-gray-700'>
             <Options options={options} dispatch={dispatch} optionsDispatch={optionsDispatch} />
+            </div>
             <div
                 ref={(element) => {
                 if (element) {
@@ -182,7 +219,7 @@ export default function Page() {
                 >
                     <div className='absolute flex-row' style={{ width: widget.width, height: widget.height, border: '1px solid white' }}>
                         <div ref={(el) => { contentRef.current[widget.id] = el }} className='absolute flex-auto'>
-                        <div style={{borderTop: '1px solid white'}}>
+                        <div>
                         {widget.component ? (
                             <div>
                             <widget.component item={widget} />
@@ -229,6 +266,24 @@ export default function Page() {
                 </div>
                 ))}
             </div>
+            {options[0].snapType === 'grid' && (
+        <div className="absolute inset-0 pointer-events-none">
+            {Array.from({ length: Math.floor((canvasRef.current?.clientHeight ?? 0) / GRID_SIZE_HEIGHT) }).map((_, rowIndex) => (
+                <div
+                    key={rowIndex}
+                    className="absolute w-full border-t border-gray-700 opacity-30"
+                    style={{ top: rowIndex * GRID_SIZE_HEIGHT }}
+                />
+            ))}
+            {Array.from({ length: Math.floor((canvasRef.current?.clientWidth ?? 0) / GRID_SIZE_WIDTH) }).map((_, colIndex) => (
+                <div
+                    key={colIndex}
+                    className="absolute h-full border-l border-gray-700 opacity-30"
+                    style={{ left: colIndex * GRID_SIZE_WIDTH }}
+                />
+                ))}
+            </div>
+            )}
             </div>
         </DndProvider>
     );

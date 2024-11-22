@@ -38,6 +38,8 @@ function widgetReducer(widgets: Item[], action: any) {
                     ? { ...widget, width: action.width, height: action.height }
                     : widget
             );
+        case 'setWidgets':
+            return action.payload;
         
         case 'addedHeader':
             return [...widgets, {
@@ -86,10 +88,11 @@ function widgetReducer(widgets: Item[], action: any) {
                 return parsedWidgets.map((widget: Item) => ({
                     ...widget,
                     component: widgets.find((w) => w.name === widget.name)?.component,
-                    isEditing: false,
+                    toolBar: widgets.find((w) => w.name === widget.name)?.toolBar,
+                    isEditing: false
                 }));
             }
-            return widgetsInitial[0].items;
+            return widgets;
         default:
             throw Error('Unknown action type' + action.type);
     }

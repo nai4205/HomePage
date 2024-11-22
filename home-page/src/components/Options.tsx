@@ -14,6 +14,10 @@ export const Options: React.FC<{ options: any, dispatch: React.Dispatch<any>, op
 
     function handleWidgetSizeGrid(optionsDispatch: React.Dispatch<any>) {
         const currentWidget = widgets.filter((widget) => widget.isEditing === true);
+        if (currentWidget.length === 0) {
+            alert('No widget is currently selected.');
+            return;
+        }
         handleGridSizeChange(optionsDispatch, 0, currentWidget[0].width, currentWidget[0].height);
     }
     

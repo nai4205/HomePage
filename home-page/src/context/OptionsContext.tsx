@@ -43,6 +43,12 @@ function optionsReducer(options: Options[], action: any) {
                     ? { ...option, gridSizeWidth: action.gridSizeWidth, gridSizeHeight: action.gridSizeHeight }
                     : option
             );
+        case 'storeCanvasSize':
+            return options.map((option) =>
+                option.id === 0
+                    ? { ...option, canvasWidth: action.width, canvasHeight: action.height }
+                    : option
+            );
         default:
             throw Error('Unknown action type' + action.type);
     }
