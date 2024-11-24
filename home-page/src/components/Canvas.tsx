@@ -98,7 +98,7 @@ export default function Page() {
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div ref={canvasRef} className="relative mx-auto flex-1 h-screen bg-gray-900" >
+            <div ref={canvasRef} className="relative h-dvh w-dvh bg-gray-900" >
             <div className='bg-gray-700'>
             <Options options={options} dispatch={dispatch} optionsDispatch={optionsDispatch} />
             </div>
@@ -111,15 +111,22 @@ export default function Page() {
                 className="flex-1 h-full"
                 style={{ border: isOver ? '2px dashed white' : '2px solid transparent' }}
             >
+                
                 {widgets.filter(widget => widget.visible).map((widget: Item) => (
                 <div key={widget.id}>
                 <div>
+                {widget.isEditing ? (
+                <div className='absolute h-screen' style={{ left: widget.x, top: widget.y-widget.toolBarHeight, width: widget.width, height: widget.height }}>
+                {widget.toolBar && <widget.toolBar item={widget} />} 
+                </div>
+                ) : null}
                 </div>
                 <div
-                    className="absolute h-screen flex flex-col overflow-hidden"
+                    className="absolute h-screen flex flex-col overflow-hidden border border-white"
                     style={{ left: widget.x, top: widget.y, width: widget.width, height: widget.height }}
                 >
-                    <div className='' style={{ width: widget.width, height: widget.height, border: '1px solid white' }}>
+                     
+                    <div className='' style={{ width: widget.width, height: widget.height}}>
                         <div ref={(el) => { contentRef.current[widget.id] = el }}>
                         <div>
                         {widget.isEditing && widget.editComponent ? (

@@ -67,31 +67,28 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
 
     return (
         <div className='flex md:flex md:flex-grow flex-col static' style={{width: item.width, height: item.height}}>
-        <div className='' ref={(el) => { toolBarRef.current[item.id] = el }} >
-            <div style={{ border: '2px solid #4CAF50' }} className='w-full'>
-            {item.toolBar && <item.toolBar item={item} />} 
-            </div>
-        </div>
-
-            <div onDoubleClick={handleDoubleClick} className='m-3 flex-grow'>
+            <div className='flex-grow'></div>
+            <div onDoubleClick={handleDoubleClick} className='m-3 h-full w-full border'>
                 {isEditing ? (
-                    <div>
-                        <textarea
-                            value={currentText}
-                            onChange={handleChange}
-                            onKeyDown={handleKeyDown}
-                            onBlur={handleBlur}
-                            autoFocus
-                            className='w-full h-full'
-                        />
-                    </div>
+                <div>
+                    <textarea
+                    value={currentText}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    onBlur={handleBlur}
+                    autoFocus
+                    className='w-full h-full'
+                    />
+                </div>
                 ) : (
-                    <HeaderText item={item} />
+                <HeaderText item={item} />
                 )}
-                
-            </div>
-            <ResizeComponent item={item} contentWidth={50} contentHeight={50} />
             <MoveComponent item={item} />
+            </div>
+            <div className='flex justify-between items-center p-2 border-t'>
+            <ResizeComponent item={item} contentWidth={50} contentHeight={50} />
+            </div>
+            
         </div>
     );
 };

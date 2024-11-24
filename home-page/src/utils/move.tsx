@@ -64,9 +64,7 @@ const MoveComponent: React.FC<MoveComponentProps> = ({
     return (
         <div    
         className="w-full h-full"
-        style={{
-        cursor: 'se-resize',
-        }}
+        style={{cursor: 'se-resize',}}
         onMouseDown={(e) =>
         onMove(e)
         }

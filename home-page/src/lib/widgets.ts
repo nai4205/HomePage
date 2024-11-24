@@ -10,6 +10,7 @@ export type Item = {
   component: React.FC<{ item: Item  }>; 
   editComponent: React.FC<{ item: Item}>;
   toolBar: React.FC<{ item: Item }>;
+  toolBarHeight: number;
   x: number;
   y: number;
   width: number;
@@ -29,6 +30,7 @@ export const widgets: { name: string; items: Item[] }[] = [
         component: Header,
         editComponent: EHeader,
         toolBar: HeaderToolBar,
+        toolBarHeight: 50,
         x: 0,
         y: 0,
         width: 50,

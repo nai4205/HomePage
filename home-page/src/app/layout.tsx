@@ -19,15 +19,13 @@ export default function RootLayout({
     <OptionsProvider>
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, height=device-height initial-scale=1.0" />
       </head>
       <WidgetProvider>
-      <body className="bg-gray-1100 flex h-screen">
+      <body className="bg-gray-1100 h-dvh w-dvh">
         <SideBar />
-        <div className="lg:pl-72 flex-1">
-          <div className="flex-1">
-              <div>{children}</div>
-          </div>
+        <div className="lg:pl-72">
+            <div>{children}</div>
         </div>
       </body>
       </WidgetProvider>
