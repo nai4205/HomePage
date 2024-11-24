@@ -122,12 +122,10 @@ export default function Page() {
                     <div className='' style={{ width: widget.width, height: widget.height, border: '1px solid white' }}>
                         <div ref={(el) => { contentRef.current[widget.id] = el }}>
                         <div>
-                        {widget.component ? (
-                            <div>
-                            <widget.component item={widget} />
-                            </div>
+                        {widget.isEditing && widget.editComponent ? (
+                            <widget.editComponent item={widget} />
                         ) : (
-                            <div className="text-white">{widget.name}</div>
+                            <widget.component item={widget} />
                         )}
                         </div>
                         </div>

@@ -9,19 +9,17 @@ import ResizeComponent from '@/utils/resize';
 import MoveComponent from '@/utils/move';
 import { OptionsContext } from '@/context/OptionsContext';
 
-export const EHeader: React.FC = () => {
-    const widgets = useContext(WidgetContext);
-    const activeWidget = widgets.find((widget) => widget.isEditing);
+export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
 
-    const item = activeWidget
-    if (!item) {
-        return null;
-    }
+    console.log(item);
+    if (!item) return null;
+
     
     const [isEditing, setIsEditing] = useState(false);
     const [currentText, setCurrentText] = useState(item.name);
     const dispatch = useContext(WidgetDispatchContext);
     const options = useContext(OptionsContext);
+    
     
     const ref = React.useRef<HTMLDivElement>(null);
     const toolBarRef = React.useRef<{ [key: number]: HTMLDivElement | null }>({});
@@ -63,6 +61,7 @@ export const EHeader: React.FC = () => {
         });
         setIsEditing(false);
     };
+    console.log("item", item, "isEditing", item.isEditing);
     
 
     return (
@@ -116,8 +115,8 @@ export const EHeader: React.FC = () => {
                 )}
                 
             </div>
-            <ResizeComponent contentWidth={50} contentHeight={50} />
-            <MoveComponent />
+            <ResizeComponent item={item} contentWidth={50} contentHeight={50} />
+            <MoveComponent item={item} />
         </div>
     );
 };

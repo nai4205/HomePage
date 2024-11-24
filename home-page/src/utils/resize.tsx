@@ -7,19 +7,18 @@ import { OptionsContext } from "@/context/OptionsContext";
 interface ResizeComponentProps {
     contentWidth: number;
     contentHeight: number;
+    item: any;
 }
 
 const ResizeComponent: React.FC<ResizeComponentProps> = ({
     contentWidth,
     contentHeight,
+    item,
 }) => {
-
-
-    const widgets = useContext(WidgetContext);
-    const activeWidget = widgets.filter((widget) => widget.isEditing === true);
-    const widgetId = activeWidget[0].id;
-    const startX = activeWidget[0].x;
-    const startY = activeWidget[0].y;
+    const activeWidget = item;
+    const widgetId = activeWidget.id;
+    const startX = activeWidget.x;
+    const startY = activeWidget.y;
 
     const options = useContext(OptionsContext);
 

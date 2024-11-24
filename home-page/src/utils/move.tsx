@@ -3,13 +3,15 @@ import { handleWidgetMove } from "@/context/WidgetContextFunctions";
 import { WidgetContext, WidgetDispatchContext } from "@/context/WidgetContext";
 import { OptionsContext } from "@/context/OptionsContext";
 
-const MoveComponent: React.FC = ({
-   
+interface MoveComponentProps {
+    item: any;
+}
+
+const MoveComponent: React.FC<MoveComponentProps> = ({
+   item,
 }) => {
-    const widgets = useContext(WidgetContext);
-    const activeWidget = widgets.filter((widget) => widget.isEditing === true);
-    const widget = activeWidget[0];
-    const id = widget.id;
+    const widget = item
+    const id = item.id
 
     const options = useContext(OptionsContext);
 
