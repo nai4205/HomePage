@@ -28,3 +28,11 @@ export const handleStoreCanvasSize = (dispatch : React.Dispatch<any>, width: num
         height: height,
     });
 }
+
+export const handleStoreCanvasPos = (dispatch : React.Dispatch<any>, left: number, top: number) => {
+    dispatch({
+        type: 'storeCanvasPos',
+        left: left,
+        top: top,
+    });
+}

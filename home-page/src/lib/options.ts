@@ -5,6 +5,8 @@ export interface Options {
     gridSizeHeight: number;
     canvasWidth: number;
     canvasHeight: number;
+    canvasLeft: number;
+    canvasTop: number;
 }
 
 export const options : Options[] = [
@@ -14,7 +16,9 @@ export const options : Options[] = [
     gridSizeWidth: 10,
     gridSizeHeight: 10,
     canvasWidth: 0,
-    canvasHeight: 0
+    canvasHeight: 0,
+    canvasLeft: 0,
+    canvasTop: 0,
     },
 
 ]

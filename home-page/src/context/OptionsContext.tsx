@@ -49,6 +49,12 @@ function optionsReducer(options: Options[], action: any) {
                     ? { ...option, canvasWidth: action.width, canvasHeight: action.height }
                     : option
             );
+        case 'storeCanvasPos':
+            return options.map((option) =>
+                option.id === 0
+                    ? { ...option, canvasLeft: action.left, canvasTop: action.top }
+                    : option
+            );
         default:
             throw Error('Unknown action type' + action.type);
     }

@@ -15,8 +15,13 @@ export const Header: React.FC<{ item: Item }> = ({ item }) => {
     };
 
     return (
-        <div className='p-3 flex-auto w-fit h-fit' onDoubleClick={handleDoubleClick}>
-                <h1 className='text-white'>{item.name}</h1>
+        <div className='absolute' style={{width: item.width, height: item.height}} onDoubleClick={handleDoubleClick}>
+                <h1 className='break-words'
+                    style={{
+                      wordWrap: 'break-word',
+                      overflowWrap: 'break-word',
+                      whiteSpace: 'normal',
+                    }}>{item.name}</h1>
         </div>
     );
 };

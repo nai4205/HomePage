@@ -1,16 +1,30 @@
 'use client';
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, use } from 'react';
 import { Item } from '@/lib/widgets';
-import { WidgetDispatchContext } from '@/context/WidgetContext';
+import { WidgetDispatchContext, WidgetContext } from '@/context/WidgetContext';
 import { handleChangeComponent } from '@/context/WidgetContextFunctions';
 import { handleRemoveById, handleWidgetResize, handleIsEditing } from '@/context/WidgetContextFunctions';
 import { Header } from '@/widgets/Header/Header';
+import ResizeComponent from '@/utils/resize';
+import MoveComponent from '@/utils/move';
+import { OptionsContext } from '@/context/OptionsContext';
 
-export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
+export const EHeader: React.FC = () => {
+    const widgets = useContext(WidgetContext);
+    const activeWidget = widgets.find((widget) => widget.isEditing);
+
+    const item = activeWidget
+    if (!item) {
+        return null;
+    }
+    
     const [isEditing, setIsEditing] = useState(false);
     const [currentText, setCurrentText] = useState(item.name);
     const dispatch = useContext(WidgetDispatchContext);
+    const options = useContext(OptionsContext);
+    
     const ref = React.useRef<HTMLDivElement>(null);
+    const toolBarRef = React.useRef<{ [key: number]: HTMLDivElement | null }>({});
 
     useEffect(() => {
         if(item.isEditing == false){
@@ -19,12 +33,6 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
     }
     , [item.isEditing]);
 
-    useEffect(() => {
-        if(!ref.current || !item) return;
-        if(item.width < ref.current?.clientWidth || item.height < ref.current?.clientHeight){
-            handleWidgetResize(dispatch, item.id, ref.current?.clientWidth || 0, ref.current?.clientHeight || 0);
-        }
-    }, []);
 
     const handleDoubleClick = () => {
         setIsEditing(true);
@@ -55,13 +63,33 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
         });
         setIsEditing(false);
     };
-
     
 
     return (
-        <div className='p-3 flex-auto w-full' ref={ref}>
+        <div className='flex md:flex md:flex-grow flex-col static' style={{width: item.width, height: item.height}}>
+        <div className='' ref={(el) => { toolBarRef.current[item.id] = el }} >
+            <div style={{ border: '2px solid #4CAF50' }} className='w-full'>
+            {item.toolBar && <item.toolBar item={item} />} 
+            </div>
+        </div>
             
-            <div onDoubleClick={handleDoubleClick} className='mt-2'>
+                        
+                        {/* <div
+                            style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 0,
+                            width: '10px',
+                            height: '10px',
+                            cursor: 'se-resize',
+                            backgroundColor: 'gray',
+                            }}
+                            onMouseDown={(e) =>
+                            onMoveStart(e, item.id) // Start resizing the specific widget
+                            }
+                        /> */}
+                        
+            <div onDoubleClick={handleDoubleClick} className='m-3 flex-grow'>
                 {isEditing ? (
                     <div>
                         <textarea
@@ -70,13 +98,26 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
                             onKeyDown={handleKeyDown}
                             onBlur={handleBlur}
                             autoFocus
-                            className='w-full h-full flex-auto p-2 border'
+                            className='w-full h-full'
                         />
                     </div>
                 ) : (
-                    <h1 className='text-white'>{item.name}</h1>
+                    <h1
+                    ref={ref}
+                    className='break-words'
+                    style={{
+                      wordWrap: 'break-word',
+                      overflowWrap: 'break-word',
+                      whiteSpace: 'normal',
+                    }}
+                  >
+                    {item.name}
+                  </h1>
                 )}
+                
             </div>
+            <ResizeComponent contentWidth={50} contentHeight={50} />
+            <MoveComponent />
         </div>
     );
 };
