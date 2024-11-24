@@ -4,6 +4,7 @@ import { Item } from '@/lib/widgets';
 import { WidgetDispatchContext } from '@/context/WidgetContext';
 import  EHeader from  './EHeader';
 import { handleChangeComponent, handleIsEditing } from '@/context/WidgetContextFunctions';
+import { HeaderText } from './HeaderText';
 
 export const Header: React.FC<{ item: Item }> = ({ item }) => {
     const dispatch = useContext(WidgetDispatchContext);
@@ -16,12 +17,7 @@ export const Header: React.FC<{ item: Item }> = ({ item }) => {
 
     return (
         <div className='absolute' style={{width: item.width, height: item.height}} onDoubleClick={handleDoubleClick}>
-                <h1 className='break-words'
-                    style={{
-                      wordWrap: 'break-word',
-                      overflowWrap: 'break-word',
-                      whiteSpace: 'normal',
-                    }}>{item.name}</h1>
+            <HeaderText item={item}/>
         </div>
     );
 };

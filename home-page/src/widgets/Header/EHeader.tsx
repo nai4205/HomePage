@@ -8,6 +8,7 @@ import { Header } from '@/widgets/Header/Header';
 import ResizeComponent from '@/utils/resize';
 import MoveComponent from '@/utils/move';
 import { OptionsContext } from '@/context/OptionsContext';
+import { HeaderText } from './HeaderText';
 
 export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
 
@@ -71,23 +72,7 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
             {item.toolBar && <item.toolBar item={item} />} 
             </div>
         </div>
-            
-                        
-                        {/* <div
-                            style={{
-                            position: 'absolute',
-                            left: 0,
-                            top: 0,
-                            width: '10px',
-                            height: '10px',
-                            cursor: 'se-resize',
-                            backgroundColor: 'gray',
-                            }}
-                            onMouseDown={(e) =>
-                            onMoveStart(e, item.id) // Start resizing the specific widget
-                            }
-                        /> */}
-                        
+
             <div onDoubleClick={handleDoubleClick} className='m-3 flex-grow'>
                 {isEditing ? (
                     <div>
@@ -101,17 +86,7 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
                         />
                     </div>
                 ) : (
-                    <h1
-                    ref={ref}
-                    className='break-words'
-                    style={{
-                      wordWrap: 'break-word',
-                      overflowWrap: 'break-word',
-                      whiteSpace: 'normal',
-                    }}
-                  >
-                    {item.name}
-                  </h1>
+                    <HeaderText item={item} />
                 )}
                 
             </div>
