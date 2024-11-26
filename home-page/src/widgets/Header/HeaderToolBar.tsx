@@ -18,7 +18,7 @@ export const HeaderToolBar: React.FC<{ item: Item }> = ({ item }) => {
     };
 
     return (
-            <div className='flex justify-between items-center bg-gray-800 p-2 m-2 border-2 w-full h-fit'>
+            <div className='flex justify-between items-center bg-gray-800 p-2 m-2 w-full h-fit'>
             <div className='flex w-full justify-around'>
                 <button onClick={handleDelete} className='text-red-500'><TrashIcon className="block w-6 text-gray-400"/>
                 </button>

@@ -130,7 +130,7 @@ export default function Canvas({ isEditing }: CanvasProps) {
                 ) : null}
                 </div>
                 <div
-                    className="absolute h-screen flex flex-col overflow-hidden border border-white"
+                    className="absolute h-screen flex flex-col overflow-hidden border"
                     style={{ left: widget.x, top: widget.y, width: widget.width, height: widget.height }}
                 >
                      
@@ -170,7 +170,7 @@ export default function Canvas({ isEditing }: CanvasProps) {
             </div>
         </DndProvider>
         ) : (
-            <div ref={canvasRef} className="relative h-dvh w-dvh bg-gray-500">
+            <div ref={canvasRef} className="relative h-dvh w-dvh">
                 <SavedLayout editing={isEditing} />
             </div>
         )}

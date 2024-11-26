@@ -68,7 +68,7 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
     return (
         <div className='flex md:flex md:flex-grow flex-col static' style={{width: item.width, height: item.height}}>
             <div className='flex-grow'></div>
-            <div onDoubleClick={handleDoubleClick} className='m-3 h-full w-full border'>
+            <div onDoubleClick={handleDoubleClick} className='m-3 h-full w-full'>
                 {isEditing ? (
                 <div>
                     <textarea
@@ -85,7 +85,7 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
                 )}
             <MoveComponent item={item} />
             </div>
-            <div className='flex justify-between items-center p-2 border-t'>
+            <div className='flex justify-between items-center p-2'>
             <ResizeComponent item={item} contentWidth={50} contentHeight={50} />
             </div>
             
