@@ -25,11 +25,13 @@ export const handleAddHeader = (dispatch : React.Dispatch<any>, x : number, y : 
         type: 'addedHeader',
         id: new Date().getTime(),
         name: 'Header',
+        widgetType: 'Header',
         x: x,
         y: y,
         width: 200,
         height: 100,
         visible: true,
+        isEditing: false,
     });
 }
 

@@ -20,6 +20,10 @@ export const Options: React.FC<{ options: any, dispatch: React.Dispatch<any>, op
         }
         handleGridSizeChange(optionsDispatch, 0, currentWidget[0].width, currentWidget[0].height);
     }
+
+    function Load() {
+        window.location.href = '/homepage';
+    }
     
 
     return (
@@ -28,7 +32,7 @@ export const Options: React.FC<{ options: any, dispatch: React.Dispatch<any>, op
                 {showOptions ? (
                 <>
                     <button className='bg-white m-1' onClick={() => handleSave(dispatch)}>Save</button>
-                    <button className='bg-white' onClick={() => handleLoad(dispatch)}>Load</button>
+                    <button className='bg-white' onClick={() => Load()}>Load</button>
                     <button className='bg-white mx-1' onClick={() => handleSnapTypeToggle(optionsDispatch, 0)}>Toggle snap</button>
                     <div className="m-1 bg-white w-fit">
                     <label htmlFor="gridSize" className="mr-2">Grid Size:</label>

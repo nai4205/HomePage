@@ -9,7 +9,7 @@ export default function Home() {
   return ( 
     <DndProvider backend={HTML5Backend}>
     <div className='flex-1'>
-      <Canvas/>
+      <Canvas isEditing={true}/>
     </div>
     </DndProvider>
   );

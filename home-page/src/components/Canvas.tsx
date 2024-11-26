@@ -5,17 +5,21 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { widgets as widgetsInitial, type Item } from '@/lib/widgets';
 import { WidgetDispatchContext } from '@/context/WidgetContext';
 import { WidgetContext } from '@/context/WidgetContext';
-import { handleWidgetMove, handleWidgetResize, handleAddHeader, } from '@/context/WidgetContextFunctions';
+import { handleWidgetMove, handleWidgetResize, handleAddHeader, handleLoad, } from '@/context/WidgetContextFunctions';
 import { OptionsDispatchContext } from '@/context/OptionsContext';
 import { OptionsContext } from '@/context/OptionsContext';
 import  { Options } from './Options';
 import { handleStoreCanvasSize, handleStoreCanvasPos } from '@/context/OptionsContextFunctions';
+import SavedLayout from './SavedLayout';
 
+interface CanvasProps {
+    isEditing: boolean;
+}
 
-export default function Page() {
+export default function Canvas({ isEditing }: CanvasProps) {
     const canvasRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<{ [key: number]: HTMLDivElement | null }>({});
-
+    const [storedWidgets, setStoredWidgets] = useState(false);
 
     let nextId = 0;
 
@@ -31,6 +35,7 @@ export default function Page() {
     useEffect(() => {
         handleStoreCanvasSize(optionsDispatch, canvasRef.current?.clientWidth || 0, canvasRef.current?.clientHeight || 0);
         handleStoreCanvasPos(optionsDispatch, canvasRef.current?.getBoundingClientRect().left || 0, canvasRef.current?.getBoundingClientRect().top || 0);
+        handleLoad(dispatch);
     },[]);
 
     useEffect(() => {
@@ -97,6 +102,8 @@ export default function Page() {
     }));
 
     return (
+        <>
+        {isEditing ? (
         <DndProvider backend={HTML5Backend}>
             <div ref={canvasRef} className="relative h-dvh w-dvh bg-gray-900" >
             <div className='bg-gray-700'>
@@ -161,5 +168,11 @@ export default function Page() {
             )}
             </div>
         </DndProvider>
+        ) : (
+            <div ref={canvasRef} className="relative h-dvh w-dvh bg-gray-900">
+                <SavedLayout editing={isEditing} />
+            </div>
+        )}
+        </>
     );
     }
