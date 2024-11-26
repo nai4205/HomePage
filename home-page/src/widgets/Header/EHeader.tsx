@@ -3,7 +3,6 @@ import React, { useState, useContext, useEffect, use } from 'react';
 import { Item } from '@/lib/widgets';
 import { WidgetDispatchContext, WidgetContext } from '@/context/WidgetContext';
 import { handleChangeComponent } from '@/context/WidgetContextFunctions';
-import { handleRemoveById, handleWidgetResize, handleIsEditing } from '@/context/WidgetContextFunctions';
 import { Header } from '@/widgets/Header/Header';
 import ResizeComponent from '@/utils/resize';
 import MoveComponent from '@/utils/move';
@@ -19,12 +18,7 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentText, setCurrentText] = useState(item.name);
     const dispatch = useContext(WidgetDispatchContext);
-    const options = useContext(OptionsContext);
     
-    
-    const ref = React.useRef<HTMLDivElement>(null);
-    const toolBarRef = React.useRef<{ [key: number]: HTMLDivElement | null }>({});
-
     useEffect(() => {
         if(item.isEditing == false){
             handleChangeComponent(dispatch, item.id, Header);
@@ -66,7 +60,7 @@ export const EHeader: React.FC<{ item: Item }> = ({ item }) => {
     
 
     return (
-        <div className='flex md:flex md:flex-grow flex-col static' style={{width: item.width, height: item.height}}>
+        <div className='static' style={{width: item.width, height: item.height}}>
             <div className='flex-grow'></div>
             <div onDoubleClick={handleDoubleClick} className='m-3 h-full w-full'>
                 {isEditing ? (

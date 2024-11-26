@@ -130,19 +130,18 @@ export default function Canvas({ isEditing }: CanvasProps) {
                 ) : null}
                 </div>
                 <div
-                    className="absolute h-screen flex flex-col overflow-hidden border"
+                    className={`absolute h-screen flex flex-col overflow-hidden ${widget.isEditing ? 'border' : ''}`}
                     style={{ left: widget.x, top: widget.y, width: widget.width, height: widget.height }}
                 >
-                     
-                    <div className='' style={{ width: widget.width, height: widget.height}}>
+                    <div className='' style={{ width: widget.width, height: widget.height }}>
                         <div ref={(el) => { contentRef.current[widget.id] = el }}>
-                        <div>
-                        {widget.isEditing && widget.editComponent ? (
-                            <widget.editComponent item={widget} />
-                        ) : (
-                            <widget.component item={widget} />
-                        )}
-                        </div>
+                            <div>
+                                {widget.isEditing && widget.editComponent ? (
+                                    <widget.editComponent item={widget} />
+                                ) : (
+                                    <widget.component item={widget} />
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
