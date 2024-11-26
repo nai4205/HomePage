@@ -105,9 +105,10 @@ export default function Canvas({ isEditing }: CanvasProps) {
         <>
         {isEditing ? (
         <DndProvider backend={HTML5Backend}>
+            <Options options={options} dispatch={dispatch} optionsDispatch={optionsDispatch} />
+
             <div ref={canvasRef} className="relative h-dvh w-dvh bg-gray-900" >
             <div className='bg-gray-700'>
-            <Options options={options} dispatch={dispatch} optionsDispatch={optionsDispatch} />
             </div>
             <div
                 ref={(element) => {
