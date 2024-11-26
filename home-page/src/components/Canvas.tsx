@@ -170,7 +170,7 @@ export default function Canvas({ isEditing }: CanvasProps) {
             </div>
         </DndProvider>
         ) : (
-            <div ref={canvasRef} className="relative h-dvh w-dvh bg-gray-900">
+            <div ref={canvasRef} className="relative h-dvh w-dvh bg-gray-500">
                 <SavedLayout editing={isEditing} />
             </div>
         )}

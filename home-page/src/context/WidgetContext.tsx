@@ -68,8 +68,8 @@ function widgetReducer(widgets: Item[], action: any) {
                 width: action.width,
                 height: action.height,
                 component: componentByType(action.widgetType).component,
-                toolBar: widgets.find((widget) => widget.name === action.name)?.toolBar,
-                toolBarHeight: widgets.find((widget) => widget.name === action.name)?.toolBarHeight,
+                toolBar: componentByType(action.widgetType).toolBar,
+                toolBarHeight: 50,
                 visible: action.visible,
                 isEditing: action.isEditing,
             }];
@@ -104,7 +104,6 @@ function widgetReducer(widgets: Item[], action: any) {
             const storedWidgets = JSON.parse(localStorage.getItem('widgets') || '[]');
             console.log(storedWidgets);
             return storedWidgets
-                .filter((widget: Item) => widget.id !== -1)
                 .map((widget: Item) => ({
                     ...widget,
                     component: componentByType(widget.widgetType).component,

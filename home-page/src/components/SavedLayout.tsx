@@ -11,6 +11,7 @@ interface SavedLayoutProps {
 
 const SavedLayout: React.FC<SavedLayoutProps> = ({ editing }) => {
     const dispatch = useContext(WidgetDispatchContext);
+
     useEffect(() => {
         handleLoad(dispatch);
     }, []);

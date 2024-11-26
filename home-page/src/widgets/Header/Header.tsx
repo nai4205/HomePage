@@ -11,10 +11,9 @@ export const Header: React.FC<{ item: Item }> = ({ item }) => {
     
 
     const handleDoubleClick = () => {
-        if(item.editComponent){
         handleChangeComponent(dispatch, item.id, EHeader);
         handleIsEditing(dispatch, item.id, true);
-        }
+        
     };
 
     return (
